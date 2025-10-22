@@ -21,11 +21,10 @@ Coloca tu archivo con ese nombre dentro de la carpeta `data/` antes de ejecutar 
 
 Ejecución local
 
-1. Crear un entorno virtual (opcional pero recomendado):
+1. Crear y activar un entorno virtual (opcional pero recomendado):
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate  # (Windows: .venv\Scripts\activate)
 ```
 
 2. Instalar dependencias:
@@ -39,6 +38,31 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
+
+Captura de pantalla (simulada)
+
+![Captura simulada](docs/screenshot-simulated.png)
+
+La imagen anterior es una captura de ejemplo que muestra la interfaz con búsqueda, métricas y tabla paginada. Sustituye por una captura real si la tienes.
+
+Solución de problemas
+
+- Error al instalar Pillow o al compilar dependencias nativas:
+    - Mensaje típico: "The headers or library files could not be found for jpeg"
+    - Solución en Ubuntu/Debian: `sudo apt-get update && sudo apt-get install -y libjpeg-dev zlib1g-dev libtiff-dev libopenjp2-7-dev libfreetype-dev libwebp-dev build-essential pkg-config`
+
+- Puerto 8501 en uso:
+    - Mensaje en logs: "Port 8501 is already in use"
+    - Solución: detener la instancia que usa el puerto (por ejemplo `ps aux | grep streamlit` y `kill <PID>`), o arrancar en otro puerto: `streamlit run app.py --server.port 8502`.
+
+- El Excel tiene múltiples hojas o no carga las columnas esperadas:
+    - La app solicita subir el archivo o seleccionar la hoja cuando encuentre varias.
+    - Asegúrate de que el archivo contenga las columnas obligatorias: `dataset_id`, `title`, `title_es`.
+
+- Errores durante `streamlit run` relacionados con CORS/XSRF:
+    - Verás una advertencia si `server.enableCORS` y `server.enableXsrfProtection` están en conflicto; normalmente no impide ejecutar localmente.
+
+Si necesitas más ayuda, copia aquí la salida del terminal o del archivo `.streamlit_run.log` y lo reviso.
 
 Despliegue
 
