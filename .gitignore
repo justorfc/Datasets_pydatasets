@@ -143,6 +143,30 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+# Entornos virtuales
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest cache
+.pytest_cache/
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Byte-compiled / optimized / DLL files
+*.so
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
 
 # Spyder project settings
 .spyderproject
