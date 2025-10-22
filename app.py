@@ -244,6 +244,10 @@ else:
     with col1:
         st.download_button("Descargar CSV (filtrado completo)", data=csv_full, file_name="pydataset_filtered.csv", mime="text/csv")
     with col2:
+        st.download_button("Descargar CSV (página visible)", data=csv_page, file_name="pydataset_page.csv", mime="text/csv")
+    # Mostrar la tabla principal (siempre visible)
+    st.dataframe(page_df, use_container_width=True)
+
     # Código browsing: mostrar y copiar archivos .md en `codigos/`
     if show_codes:
         st.sidebar.markdown("## Códigos disponibles")
@@ -300,48 +304,22 @@ else:
             with col_dl:
                 st.download_button(label="Descargar archivo .md", data=edited, file_name=sel, mime="text/markdown")
 
-            copy_js = f"""
-            <script>
-            async function copyText(text){
-                try{
-                    await navigator.clipboard.writeText(text);
-                    const btn = document.getElementById('copy-btn');
-                    if(btn) btn.innerText = 'Copiado ✅';
-                }catch(e){
-                    alert('No se pudo copiar al portapapeles: ' + e);
-                }}
-            </script>
-            <button id='copy-btn' onclick="copyText({json.dumps(edited)})">Copiar código para Colab</button>
-            """
+            # Construir HTML/JS sin usar f-string para evitar colisiones con llaves de JS
+            js_fn = (
+                "<script>\n"
+                "async function copyText(text){\n"
+                "  try{\n"
+                "    await navigator.clipboard.writeText(text);\n"
+                "    const btn = document.getElementById('copy-btn');\n"
+                "    if(btn) btn.innerText = 'Copiado ✅';\n"
+                "  }catch(e){\n"
+                "    alert('No se pudo copiar al portapapeles: ' + e);\n"
+                "  }\n"
+                "}\n"
+                "</script>\n"
+            )
+            copy_js = js_fn + "<button id='copy-btn' onclick=\"copyText(" + json.dumps(edited) + ")\">Copiar código para Colab</button>"
             components.html(copy_js, height=80)
-
-        col_save, col_dl = st.columns([1, 1])
-        with col_save:
-            if st.button("Guardar cambios"):
-                try:
-                    write_code_file(sel, edited)
-                    st.success(f"Guardado {sel}")
-                except Exception as e:
-                    st.error(f"Error al guardar: {e}")
-        with col_dl:
-            st.download_button(label="Descargar archivo .md", data=edited, file_name=sel, mime="text/markdown")
-
-        # Botón de copiar al portapapeles via JS (en área principal)
-        copy_js = f"""
-        <script>
-        async function copyText(text){{
-            try{{
-                await navigator.clipboard.writeText(text);
-                const btn = document.getElementById('copy-btn');
-                if(btn) btn.innerText = 'Copiado ✅';
-            }}catch(e){{
-                alert('No se pudo copiar al portapapeles: ' + e);
-            }}
-        }}
-        </script>
-        <button id='copy-btn' onclick="copyText({json.dumps(edited)})">Copiar código para Colab</button>
-        """
-        components.html(copy_js, height=80)
 
 
 # Footer
