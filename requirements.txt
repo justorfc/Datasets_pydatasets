@@ -1,0 +1,6 @@
+
+# Dependencias mínimas (versiones fijas/estables)
+streamlit==1.26.0
+pandas==2.2.3
+openpyxl==3.1.2
+python-dotenv==1.0.0

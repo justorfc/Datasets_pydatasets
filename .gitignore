@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Datos locales
+# Ignorar archivos de datos generados localmente (puedes quitar si quieres versionarlos)
+data/*.csv
+data/*.xlsx
+
+# Entornos virtuales (duplicados por compatibilidad)
+venv/
+.venv/
+.env/
