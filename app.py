@@ -5,6 +5,7 @@ import io
 import streamlit.components.v1 as components
 from pathlib import Path
 from datetime import datetime
+from typing import List
 
 # Archivo fuente esperado
 DATA_FILE = Path(__file__).parent / "data" / "pydataset_list_translated.xlsx"
@@ -184,6 +185,28 @@ st.success(f"Cargado: {DATA_FILE.name} — {len(df)} filas, {len(df.columns)} co
 st.sidebar.header("Controles")
 search_q = st.sidebar.text_input("Buscar (dataset_id, title, title_es)")
 
+# Sección para mostrar/copiar códigos
+st.sidebar.markdown("---")
+show_codes = st.sidebar.checkbox("Mostrar códigos disponibles para copiar")
+code_filter = st.sidebar.text_input("Filtrar códigos (nombre)")
+
+def list_code_files() -> List[str]:
+    p = Path(__file__).parent / "codigos"
+    if not p.exists():
+        return []
+    files = sorted([f.name for f in p.glob('*.md')])
+    return files
+
+def read_code_file(name: str) -> str:
+    p = Path(__file__).parent / "codigos" / name
+    if not p.exists():
+        return ""
+    return p.read_text(encoding='utf-8')
+
+def write_code_file(name: str, content: str) -> None:
+    p = Path(__file__).parent / "codigos" / name
+    p.write_text(content, encoding='utf-8')
+
 page_size = st.sidebar.selectbox("Tamaño de página", options=[10, 25, 50, 100], index=1)
 
 # Selector de columna para ordenación (solo columnas existentes)
@@ -245,6 +268,80 @@ else:
         components.html(copy_js, height=120)
 
     st.dataframe(page_df, use_container_width=True)
+
+# Código browsing: mostrar y copiar archivos .md en `codigos/`
+if show_codes:
+    # Mostrar controles y preview en la barra lateral para visibilidad
+    st.sidebar.markdown("## Códigos disponibles")
+    files = list_code_files()
+    if not files:
+        st.sidebar.info("No se encontraron archivos en la carpeta `codigos/`.")
+    else:
+        # aplicar filtro
+        if code_filter:
+            files = [f for f in files if code_filter.lower() in f.lower()]
+        sel = st.sidebar.selectbox("Selecciona un archivo", options=files)
+        content = read_code_file(sel)
+        st.sidebar.markdown("#### Contenido (preview)")
+        # Mostrar un preview corto o el archivo completo si no es muy grande
+        # Umbrales: líneas y chars
+        PREVIEW_MAX_LINES = 30
+        PREVIEW_MAX_CHARS = 3000
+        # Normalizar contenido y calcular métricas
+        content_str = content or ""
+        content_lines = content_str.splitlines()
+        n_lines = len(content_lines)
+        n_chars = len(content_str)
+
+        def sidebar_show_full(text: str):
+            # Mostrar el archivo completo en un expander si el usuario quiere
+            with st.sidebar.expander("Mostrar contenido completo", expanded=False):
+                st.code(text, language='python')
+
+        # Decidir si mostramos todo o un preview truncado
+        if (n_lines <= PREVIEW_MAX_LINES and n_chars <= PREVIEW_MAX_CHARS):
+            # Archivo pequeño — mostrar completo en la sidebar
+            st.sidebar.code(content_str, language='python')
+        else:
+            # Archivo grande — mostrar las primeras PREVIEW_MAX_LINES líneas
+            preview = "\n".join(content_lines[:PREVIEW_MAX_LINES])
+            # Añadir indicación de truncamiento
+            preview += f"\n\n... (archivo truncado: mostrando {PREVIEW_MAX_LINES} de {n_lines} líneas, pulsa 'Mostrar contenido completo' para ver todo)"
+            st.sidebar.code(preview, language='python')
+            # Ofrecemos un expander para ver el fichero completo en la sidebar
+            sidebar_show_full(content_str)
+
+        # En el área principal mostramos el editor completo y botones
+        st.markdown("## Editor de código seleccionado")
+        edited = st.text_area("Editar código (archivo: {})".format(sel), value=content, height=400)
+
+        col_save, col_dl = st.columns([1, 1])
+        with col_save:
+            if st.button("Guardar cambios"):
+                try:
+                    write_code_file(sel, edited)
+                    st.success(f"Guardado {sel}")
+                except Exception as e:
+                    st.error(f"Error al guardar: {e}")
+        with col_dl:
+            st.download_button(label="Descargar archivo .md", data=edited, file_name=sel, mime="text/markdown")
+
+        # Botón de copiar al portapapeles via JS (en área principal)
+        copy_js = f"""
+        <script>
+        async function copyText(text){{
+            try{{
+                await navigator.clipboard.writeText(text);
+                const btn = document.getElementById('copy-btn');
+                if(btn) btn.innerText = 'Copiado ✅';
+            }}catch(e){{
+                alert('No se pudo copiar al portapapeles: ' + e);
+            }}
+        }}
+        </script>
+        <button id='copy-btn' onclick="copyText({json.dumps(edited)})">Copiar código para Colab</button>
+        """
+        components.html(copy_js, height=80)
 
 
 # Footer
