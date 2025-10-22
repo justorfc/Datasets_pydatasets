@@ -41,7 +41,7 @@ streamlit run app.py
 
 Captura de pantalla (simulada)
 
-![Captura simulada](docs/screenshot-simulated.png)
+![Captura simulada](docs/screenshot-simulated.svg)
 
 La imagen anterior es una captura de ejemplo que muestra la interfaz con búsqueda, métricas y tabla paginada. Sustituye por una captura real si la tienes.
 
