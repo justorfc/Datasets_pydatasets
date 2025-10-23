@@ -239,6 +239,18 @@ else:
         st.download_button("Descargar CSV (página visible)", data=csv_page, file_name="pydataset_page.csv", mime="text/csv")
     st.dataframe(page_df, use_container_width=True)
 
+    # Selector desplegable para elegir un dataset (desde los resultados filtrados)
+    try:
+        available_ids = list(filtered_full['dataset_id'].astype(str).unique())
+    except Exception:
+        available_ids = list(df['dataset_id'].astype(str).unique())
+
+    if available_ids:
+        selected_dataset = st.selectbox('Seleccionar dataset (desde resultados)', options=sorted(available_ids), key='catalog_selected')
+        st.markdown(f"**Seleccionado:** `{selected_dataset}`")
+    else:
+        st.info('No hay datasets disponibles para seleccionar.')
+
     if show_codes:
         st.sidebar.markdown("## Códigos disponibles")
         files = list_code_files()
