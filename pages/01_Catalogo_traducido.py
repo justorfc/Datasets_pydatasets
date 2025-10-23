@@ -8,6 +8,7 @@ import io
 from pathlib import Path
 from datetime import datetime
 from typing import List
+import json
 
 import streamlit as st
 import pandas as pd
@@ -314,7 +315,7 @@ else:
                 "}\n"
                 "</script>\n"
             )
-            copy_js = js_fn + "<button id='copy-btn' onclick=\"copyText(" + pd.io.common.json.dumps(edited) + ")\">Copiar código para Colab</button>"
+            copy_js = js_fn + "<button id='copy-btn' onclick=\"copyText(" + json.dumps(edited) + ")\">Copiar código para Colab</button>"
             components.html(copy_js, height=80)
 
 # Footer
