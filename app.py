@@ -41,4 +41,4 @@ nav_html = '''
 </script>
 '''
 
-st.components.v1.html(nav_html, height=120)
+st.info("Usa la barra lateral 'Pages' para navegar entre 'Catálogo traducido' y 'Documentación de pydataset'.")
