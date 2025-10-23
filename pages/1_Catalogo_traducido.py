@@ -333,22 +333,22 @@ else:
 
                 # Vistas de columnas categóricas (value_counts)
                 try:
-                    with st.expander("Columnas categóricas (value_counts)", expanded=False):
-                        # detectar columnas categóricas o de baja cardinalidad
-                        cat_cols = [c for c in df_selected.columns if (str(df_selected[c].dtype) == 'object') or (pd.api.types.is_categorical_dtype(df_selected[c]))]
-                        # incluir columnas con baja cardinalidad
-                        low_card_cols = [c for c in df_selected.columns if df_selected[c].nunique(dropna=False) <= 50]
-                        cols_to_show = sorted(set(cat_cols + low_card_cols))
-                        if not cols_to_show:
-                            st.info("No se detectaron columnas categóricas o de baja cardinalidad.")
-                        else:
-                            for c in cols_to_show:
+                    # detectar columnas categóricas o de baja cardinalidad
+                    cat_cols = [c for c in df_selected.columns if (str(df_selected[c].dtype) == 'object') or (pd.api.types.is_categorical_dtype(df_selected[c]))]
+                    # incluir columnas con baja cardinalidad
+                    low_card_cols = [c for c in df_selected.columns if df_selected[c].nunique(dropna=False) <= 50]
+                    cols_to_show = sorted(set(cat_cols + low_card_cols))
+                    if not cols_to_show:
+                        st.info("No se detectaron columnas categóricas o de baja cardinalidad.")
+                    else:
+                        # Evitar anidar expanders: creamos un expander por cada columna al mismo nivel
+                        for c in cols_to_show:
+                            try:
                                 with st.expander(f"{c} (valores)", expanded=False):
-                                    try:
-                                        vc = df_selected[c].value_counts(dropna=False).head(100)
-                                        st.dataframe(vc.rename_axis(c).reset_index(name='count'))
-                                    except Exception as e:
-                                        st.write(f"No se pudo calcular value_counts para {c}: {e}")
+                                    vc = df_selected[c].value_counts(dropna=False).head(100)
+                                    st.dataframe(vc.rename_axis(c).reset_index(name='count'))
+                            except Exception as e:
+                                st.write(f"No se pudo calcular value_counts para {c}: {e}")
                 except Exception as e:
                     st.warning(f"Error al generar vistas categóricas: {e}")
 
