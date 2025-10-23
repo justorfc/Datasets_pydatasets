@@ -23,6 +23,58 @@ st.markdown(
     """
 )
 
+# Debug: mostrar si el proceso Streamlit puede importar `pydataset` y su versión.
+def _check_pydataset_import():
+    try:
+        import importlib
+        mod = importlib.import_module("pydataset")
+        ver = getattr(mod, "__version__", None)
+        return True, ver
+    except Exception as e:
+        return False, str(e)
+
+available_pydataset, pydataset_info = _check_pydataset_import()
+with st.sidebar:
+    st.markdown("---")
+    if available_pydataset:
+        st.success(f"pydataset disponible — versión: {pydataset_info}")
+    else:
+        st.error(f"pydataset NO disponible: {pydataset_info}")
+
+# Enlace directo a la página de documentación de pydataset (cliente-side).
+# Reemplazamos el markdown que provoca un rerun por un control HTML/JS que
+# intenta navegar en la misma pestaña sin forzar reruns del servidor.
+top_doc_link = '''
+<div style="display:flex;gap:8px;align-items:center;padding:6px 4px;border-radius:6px;background:#f6f8fa;max-width:640px">
+    <strong style="margin-right:8px">Documentación:</strong>
+    <button id="app-doc-open-same" style="padding:6px 10px;border-radius:4px">Ir a Documentación (misma pestaña)</button>
+    <button id="app-doc-open-blank" style="padding:6px 10px;border-radius:4px">Abrir en nueva pestaña</button>
+    <button id="app-doc-copy" style="padding:6px 8px;border-radius:4px">Copiar URL</button>
+    <span id="app-doc-msg" style="margin-left:8px;color:green"></span>
+</div>
+<script>
+    (function(){
+        // Usar la raíz del host para evitar path como '/nullsrcdoc' en iframes/preview
+        const base = window.location.origin + '/';
+        const target = base + '?page=02_Documentacion_pydataset.py';
+        document.getElementById('app-doc-msg').innerText = '';
+        document.getElementById('app-doc-copy').onclick = async function(){
+            try{ await navigator.clipboard.writeText(target); document.getElementById('app-doc-msg').innerText = 'URL copiada'; }
+            catch(e){ document.getElementById('app-doc-msg').innerText = 'Copia manual: ' + target; }
+        }
+        document.getElementById('app-doc-open-same').onclick = function(){
+            try{ if(window.parent && window.parent !== window){ window.parent.location.replace(target); return; } }catch(e){}
+            try{ window.top.location.replace(target); return; }catch(e){}
+            try{ window.location.replace(target); return; }catch(e){}
+            alert('No fue posible abrir en la misma pestaña; se abrirá en nueva pestaña.');
+            window.open(target, '_blank');
+        }
+        document.getElementById('app-doc-open-blank').onclick = function(){ window.open(target, '_blank'); }
+    })();
+</script>
+'''
+components.html(top_doc_link, height=64)
+
 
 @st.cache_data
 def load_data(path: Path):

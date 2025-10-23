@@ -50,3 +50,7 @@ validators==0.35.0
 watchdog==6.0.0
 wheel==0.45.1
 zipp==3.23.0
+
+# Añadido para la página de documentación de pydataset
+# La versión 0.3.0 no está disponible en PyPI; usar una versión publicada compatible.
+pydataset==0.2.0

@@ -80,3 +80,47 @@ Notas
   quita o modifica la línea correspondiente.
 - El archivo `app.py` es solo una demostración mínima. Puedes mejorarlo añadiendo paginación,
   filtros por columna o exportación de resultados.
+
+Documentación de pydataset
+--------------------------
+
+Se ha añadido una página dedicada que muestra documentación de los datasets disponibles en la
+biblioteca `pydataset`.
+
+Dónde está
+
+- Archivo: `pages/02_Documentacion_pydataset.py`
+
+Qué hace
+
+- Lista un catálogo resumido (columnas `dataset_id`, `title`, `package`) y permite filtrar por texto.
+- Permite seleccionar un `dataset_id` y ver su `data_info()` y la salida completa de `data(name, show_doc=True)`.
+- Muestra una vista previa opcional (primeras 10 filas) cuando está disponible.
+
+Requisitos
+
+- La página usa `pydataset`. Si no está instalada, la página muestra un `st.error` indicando que añadas
+    `pydataset` a `requirements.txt`.
+
+Cómo usar
+
+1. Asegúrate de tener el entorno y dependencias instaladas:
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+2. Ejecuta la app con Streamlit (la página está en el directorio `pages` y se cargará automáticamente):
+
+```bash
+streamlit run app.py
+```
+
+3. Abre la URL que Streamlit muestra en el terminal (por ejemplo `http://localhost:8501`).
+
+Notas
+
+- La lista de datasets depende de la versión de `pydataset` instalada y puede variar entre entornos.
+- La documentación se muestra tal como la entrega `show_doc=True` de `pydataset`.
+
