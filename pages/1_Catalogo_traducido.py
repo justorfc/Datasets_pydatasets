@@ -334,7 +334,16 @@ else:
                 # Vistas de columnas categóricas (value_counts)
                 try:
                     # detectar columnas categóricas o de baja cardinalidad
-                    cat_cols = [c for c in df_selected.columns if (str(df_selected[c].dtype) == 'object') or (pd.api.types.is_categorical_dtype(df_selected[c]))]
+                    # considerar object y las columnas con dtype Categorical
+                    cat_cols = []
+                    for c in df_selected.columns:
+                        try:
+                            dtype = df_selected[c].dtype
+                            if str(dtype) == 'object' or isinstance(dtype, pd.CategoricalDtype):
+                                cat_cols.append(c)
+                        except Exception:
+                            # fallback: tratar como no categórica si hay error
+                            continue
                     # incluir columnas con baja cardinalidad
                     low_card_cols = [c for c in df_selected.columns if df_selected[c].nunique(dropna=False) <= 50]
                     cols_to_show = sorted(set(cat_cols + low_card_cols))
