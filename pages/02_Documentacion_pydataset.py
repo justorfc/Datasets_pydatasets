@@ -61,19 +61,41 @@ def get_show_doc(name: str) -> str:
 
 
 def _nav_html() -> str:
-    return '''
-<div style="padding:6px;background:#f6f8fa;border-radius:6px;display:flex;gap:8px;align-items:center">
-  <div style="font-weight:600">Volver a raíz:</div>
-  <button id="open-new">Abrir en nueva pestaña</button>
-  <button id="copy">Copiar URL</button>
-  <span id="m" style="margin-left:8px;color:green"></span>
+        return '''
+<div style="padding:6px;background:#f6f8fa;border-radius:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div style="font-weight:600">Volver a raíz:</div>
+    <button id="open-new">Abrir en nueva pestaña</button>
+    <button id="copy">Copiar URL</button>
+    <a id="root-link" href="#" target="_blank" style="margin-left:6px;">Abrir raíz (fallback)</a>
+    <span id="m" style="margin-left:8px;color:green"></span>
+    <div id="root-text" style="width:100%;margin-top:6px;color:#333;font-size:12px"></div>
 </div>
 <script>
-  (function(){
-    const root = window.location.origin + '/';
-    document.getElementById('copy').onclick = async ()=>{ try{ await navigator.clipboard.writeText(root); document.getElementById('m').innerText='URL copiada'; }catch(e){ document.getElementById('m').innerText=root } }
-    document.getElementById('open-new').onclick = ()=> window.open(root, '_blank');
-  })();
+    (function(){
+        const root = window.location.origin + '/';
+        const copyBtn = document.getElementById('copy');
+        const openBtn = document.getElementById('open-new');
+        const msg = document.getElementById('m');
+        const link = document.getElementById('root-link');
+        const rootText = document.getElementById('root-text');
+
+        if(copyBtn){
+            copyBtn.onclick = async ()=>{
+                try{ await navigator.clipboard.writeText(root); msg.innerText='URL copiada'; }
+                catch(e){ msg.innerText = 'Copia manual: ' + root; }
+            }
+        }
+        if(openBtn){
+            openBtn.onclick = ()=> window.open(root, '_blank');
+        }
+        if(link){
+            link.href = root;
+            link.innerText = 'Abrir raíz (fallback)';
+        }
+        if(rootText){
+            rootText.innerText = 'URL raíz: ' + root + ' (cópiala si el botón falla)';
+        }
+    })();
 </script>
 '''
 

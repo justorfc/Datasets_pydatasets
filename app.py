@@ -57,6 +57,14 @@ top_doc_link = '''
         // Usar la raíz del host para evitar path como '/nullsrcdoc' en iframes/preview
         const base = window.location.origin + '/';
         const target = base + '?page=02_Documentacion_pydataset.py';
+        // Fallback visible
+        const container = document.currentScript ? document.currentScript.parentElement : document.body;
+        try{
+            const fallback = document.createElement('div');
+            fallback.style.marginTop = '6px';
+            fallback.innerHTML = '<a id="app-doc-link" href="' + target + '" target="_blank">Abrir raíz (fallback)</a><span style="margin-left:8px;color:#666;font-size:12px">' + target + '</span>';
+            container.appendChild(fallback);
+        }catch(e){ /* ignore */ }
         document.getElementById('app-doc-msg').innerText = '';
         document.getElementById('app-doc-copy').onclick = async function(){
             try{ await navigator.clipboard.writeText(target); document.getElementById('app-doc-msg').innerText = 'URL copiada'; }
